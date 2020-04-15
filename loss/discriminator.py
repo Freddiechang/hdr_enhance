@@ -27,7 +27,7 @@ class Discriminator(nn.Module):
         x = x.view(x.shape[0], -1)
         return self.classifier(x)
     
-    def base_block(self, in_channels, out_channnels, stride=1):
+    def base_block(self, in_channels, out_channels, stride=1):
         block = nn.Sequential(
             nn.Conv2d(in_channels, out_channels, kernel_size=3,
                      stride=stride, padding=1),

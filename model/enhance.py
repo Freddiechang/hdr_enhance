@@ -2,13 +2,18 @@ import torch
 import torch.nn as nn
 
 from option import args
-from model import edsr.EDSR
-from model import other.Fusion
-from model import other.Segmentation
+from model.edsr import EDSR
+from model.other import Fusion
+from model.other import Segmentation
+
+
+def make_model(args):
+    return Enhance(args)
 
 
 class Enhance(nn.Module):
     def __init__(self, args):
+        super(Enhance, self).__init__()
         self.enhance = EDSR(args)
         self.segmentation = Segmentation(args)
         self.fusion = Fusion(args)
@@ -18,4 +23,9 @@ class Enhance(nn.Module):
         s = self.segmentation(x)
         x = self.fusion(e, s)
         return x
-        
+
+
+def make_model(args):
+    device = torch.device('cpu' if args.cpu else 'cuda')
+    model = Enhance(args)
+    return model.to(device)

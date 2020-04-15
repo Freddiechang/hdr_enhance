@@ -1,4 +1,5 @@
 from model import common
+from option import args
 
 import torch
 import torch.nn as nn
@@ -21,7 +22,7 @@ class Segmentation(nn.Module):
         # N,C,H,W
         x = self.conv(x)
         # N,1,H,W
-        x = self.pool(x)
+        #x = self.pool(x)
         x = self.fc1(x.transpose(1, 3))
         x = self.relu(x)
         x = self.fc2(x)
@@ -42,8 +43,10 @@ class Fusion(nn.Module):
     
     def forward(self, x, seg):
         seg_map = []
+        #TODO: append to list then pt.stack
         for i in range(args.seg_feats):
-            seg[:, i, :, :] = seg[:, i, :, :] == i
+            seg_map.append(seg == i)
+        seg_map = torch.stack(seg_map, dim=1)
         x = x * seg_map
         x = self.conv1(x)
         x = self.conv2(x)

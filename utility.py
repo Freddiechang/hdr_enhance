@@ -44,11 +44,11 @@ class checkpoint():
         if not args.load:
             if not args.save:
                 args.save = now
-            self.dir = os.path.join('..', 'experiment', args.save)
+            self.dir = os.path.join('.', 'experiment', args.save)
         else:
-            self.dir = os.path.join('..', 'experiment', args.load)
+            self.dir = os.path.join('.', 'experiment', args.load)
             if os.path.exists(self.dir):
-                self.log = torch.load(self.get_path('psnr_log.pt'))
+                self.log = torch.load(self.get_path('log.pt'))
                 print('Continue from epoch {}...'.format(len(self.log)))
             else:
                 args.load = ''
@@ -78,11 +78,9 @@ class checkpoint():
     def save(self, trainer, epoch, is_best=False):
         trainer.model.save(self.get_path('model'), epoch, is_best=is_best)
         trainer.loss.save(self.dir)
-        trainer.loss.plot_loss(self.dir, epoch)
-
-        self.plot_psnr(epoch)
+        
         trainer.optimizer.save(self.dir)
-        torch.save(self.log, self.get_path('psnr_log.pt'))
+        torch.save(self.log, self.get_path('log.pt'))
 
     def add_log(self, log):
         self.log = torch.cat([self.log, log])
@@ -96,25 +94,6 @@ class checkpoint():
 
     def done(self):
         self.log_file.close()
-
-    def plot_psnr(self, epoch):
-        axis = np.linspace(1, epoch, epoch)
-        for idx_data, d in enumerate(self.args.data_test):
-            label = 'SR on {}'.format(d)
-            fig = plt.figure()
-            plt.title(label)
-            for idx_scale, scale in enumerate(self.args.scale):
-                plt.plot(
-                    axis,
-                    self.log[:, idx_data, idx_scale].numpy(),
-                    label='Scale {}'.format(scale)
-                )
-            plt.legend()
-            plt.xlabel('Epochs')
-            plt.ylabel('PSNR')
-            plt.grid(True)
-            plt.savefig(self.get_path('test_{}.pdf'.format(d)))
-            plt.close(fig)
 
     def begin_background(self):
         self.queue = Queue()

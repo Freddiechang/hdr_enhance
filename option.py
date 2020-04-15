@@ -19,7 +19,7 @@ parser.add_argument('--seed', type=int, default=1,
                     help='random seed')
 
 # Data specifications
-parser.add_argument('--dir_data', type=str, default='../../../dataset',
+parser.add_argument('--dir_data', type=str, default='/home/shupeizhang/Codes/Datasets/EnlightenGAN',
                     help='dataset directory')
 parser.add_argument('--dir_demo', type=str, default='../test',
                     help='demo image directory')
@@ -45,14 +45,21 @@ parser.add_argument('--no_augment', action='store_true',
                     help='do not use data augmentation')
 parser.add_argument('--resize', default=True,
                     help='do resizing on input data')
-parser.add_argument('--img_height', type=int, default=256,
-                    help='input image height')
-parser.add_argument('--img_width', type=int, default=256,
-                    help='input image width')
-
+parser.add_argument('--img_height', type=int, default=32,
+                    help='input image height, 0 to prevent resize')
+parser.add_argument('--img_width', type=int, default=32,
+                    help='input image width, 0 to prevent resize')
+parser.add_argument('--data_mode', type=str, default='train',
+                    help='data mode, "train", "val" or "test"')
+parser.add_argument('--normalization', type=str, default='0+0+0+1+1+1',
+                    help='normalization specs, mean followed by std, like "1.1+2.1+3.1+1.1+2.1+3.1"')
+parser.add_argument('--totensor', default=True,
+                    help='convert data to tensor')
+parser.add_argument('--annotation_type', type=str, default='float',
+                    help='annotation data type')
 
 # Model specifications
-parser.add_argument('--model', default='EDSR',
+parser.add_argument('--model', default='enhance',
                     help='model name')
 
 parser.add_argument('--act', type=str, default='relu',
@@ -85,7 +92,7 @@ parser.add_argument('--test_every', type=int, default=1000,
                     help='do test per every N batches')
 parser.add_argument('--epochs', type=int, default=300,
                     help='number of epochs to train')
-parser.add_argument('--batch_size', type=int, default=16,
+parser.add_argument('--batch_size', type=int, default=1,
                     help='input batch size for training')
 parser.add_argument('--split_batch', type=int, default=1,
                     help='split the batch into smaller chunks')
@@ -118,7 +125,7 @@ parser.add_argument('--gclip', type=float, default=0,
                     help='gradient clipping threshold (0 = no clipping)')
 
 # Loss specifications
-parser.add_argument('--loss', type=str, default='1*L1',
+parser.add_argument('--loss', type=str, default='1*RGAN',
                     help='loss function configuration')
 parser.add_argument('--skip_threshold', type=float, default='1e8',
                     help='skipping batch that has large error')
@@ -145,6 +152,8 @@ args = parser.parse_args()
 template.set_template(args)
 
 args.scale = list(map(lambda x: int(x), args.scale.split('+')))
+tmp = list(map(lambda x: float(x), args.normalization.split('+')))
+args.normalization = [tmp[0:3], tmp[3:6]]
 args.data_train = args.data_train.split('+')
 args.data_test = args.data_test.split('+')
 

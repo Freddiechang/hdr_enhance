@@ -1,20 +1,21 @@
 import utility
 from option import args
-from model import enhance.Enhance
-from loss import adversarial_loss.Adversarial
+import model
+import loss
+from data.enlighten import make_data_loader
 from trainer import Trainer
 
 def main():
     checkpoint = utility.checkpoint(args)
     # TODO: modify to allow loading checkpoint
     # if using GAN, both model and loss need to be loaded
-    _data_loader = []
-    _model = Enhance(args)
-    _loss = Adversarial(args)
+    _data_loader = make_data_loader(args)
+    _model = model.Model(args, checkpoint)
+    _loss = loss.Loss(args, checkpoint) if not args.test_only else None
     _trainer = Trainer(args, _data_loader, _model, _loss, checkpoint)
-    while not t.terminate():
-        t.train()
-        t.test()
+    while not _trainer.terminate():
+        _trainer.train()
+        _trainer.test()
 
     checkpoint.done()
 

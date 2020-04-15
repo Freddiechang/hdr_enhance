@@ -2,6 +2,7 @@ from types import SimpleNamespace
 
 from model import common
 from loss.discriminator import Discriminator
+import utility
 
 import torch
 import torch.nn as nn
@@ -9,12 +10,12 @@ import torch.nn.functional as F
 import torch.optim as optim
 
 class Adversarial(nn.Module):
-    def __init__(self, args):
+    def __init__(self, args, gan_type):
         super(Adversarial, self).__init__()
-        self.gan_type = args.gan_type
+        self.gan_type = gan_type
         self.gan_k = args.gan_k
         self.dis = Discriminator(args)
-        if gan_type == 'WGAN_GP':
+        if self.gan_type == 'WGAN_GP':
             # see https://arxiv.org/pdf/1704.00028.pdf pp.4
             optim_dict = {
                 'optimizer': 'ADAM',
@@ -66,13 +67,14 @@ class Adversarial(nn.Module):
                 retain_graph = True
 
             # Discriminator update
-            self.loss += loss_d.item()
-            loss_d.backward(retain_graph=retain_graph)
-            self.optimizer.step()
+            if self.dis.training:
+                self.loss += loss_d.item()
+                loss_d.backward(retain_graph=retain_graph)
+                self.optimizer.step()
 
-            if self.gan_type == 'WGAN':
-                for p in self.dis.parameters():
-                    p.data.clamp_(-1, 1)
+                if self.gan_type == 'WGAN':
+                    for p in self.dis.parameters():
+                        p.data.clamp_(-1, 1)
 
         self.loss /= self.gan_k
 

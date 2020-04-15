@@ -11,6 +11,7 @@ from tqdm import tqdm
 class Trainer():
     def __init__(self, args, loader, my_model, my_loss, ckp):
         self.args = args
+        self.scale = args.scale
 
         self.ckp = ckp
         self.loader_train = loader.loader_train
@@ -34,7 +35,9 @@ class Trainer():
         )
         self.loss.start_log()
         self.model.train()
-
+        # for unpaired training
+        self.loss.gan_set_train()
+        #######################
         timer_data, timer_model = utility.timer(), utility.timer()
 
         # TODO: change according to return of dataloader 
@@ -77,43 +80,42 @@ class Trainer():
         epoch = self.optimizer.get_last_epoch()
         self.ckp.write_log('\nEvaluation:')
         self.ckp.add_log(
-            torch.zeros(1, len(self.loader_test), len(self.scale))
+            torch.zeros(1)
         )
         self.model.eval()
-
+        # for unpaired training
+        self.loss.gan_set_eval()
+        #######################
         timer_test = utility.timer()
         if self.args.save_results: self.ckp.begin_background()
-        """
+        ########### scale is no longer needed, set to 1
+        scale = 1
+        idx_scale = 1
+        ###########
         for idx_data, d in enumerate(self.loader_test):
-            for idx_scale, scale in enumerate(self.scale):
-                d.dataset.set_scale(idx_scale)
-                for lr, hr, filename in tqdm(d, ncols=80):
-                    lr, hr = self.prepare(lr, hr)
-                    sr = self.model(lr, idx_scale)
-                    sr = utility.quantize(sr, self.args.rgb_range)
+            lr, hr = self.prepare(d['image'], d['annotation'])
+            sr = self.model(lr)
 
-                    save_list = [sr]
-                    self.ckp.log[-1, idx_data, idx_scale] += utility.calc_psnr(
-                        sr, hr, scale, self.args.rgb_range, dataset=d
-                    )
-                    if self.args.save_gt:
-                        save_list.extend([lr, hr])
+            loss = self.loss(sr, hr)
+            #used for unpaired training
+            self.ckp.log[-1] += loss
+            if self.args.save_gt:
+                save_list.extend([lr, hr])
 
-                    if self.args.save_results:
-                        self.ckp.save_results(d, filename[0], save_list, scale)
+            if self.args.save_results:
+                self.ckp.save_results(d, filename[0], save_list, scale)
 
-                self.ckp.log[-1, idx_data, idx_scale] /= len(d)
-                best = self.ckp.log.max(0)
-                self.ckp.write_log(
-                    '[{} x{}]\tPSNR: {:.3f} (Best: {:.3f} @epoch {})'.format(
-                        d.dataset.name,
-                        scale,
-                        self.ckp.log[-1, idx_data, idx_scale],
-                        best[0][idx_data, idx_scale],
-                        best[1][idx_data, idx_scale] + 1
-                    )
-                )
-        """
+        #self.ckp.log[-1] /= (idx_data + 1)
+        best = self.ckp.log.min(0)
+        self.ckp.write_log(
+            '[{} x{}]\tLoss: {:.3f} (Best: {:.3f} @epoch {})'.format(
+                'test_run',
+                scale,
+                self.ckp.log[-1],
+                best[0],
+                best[1] + 1
+            )
+        )
         self.ckp.write_log('Forward: {:.2f}s\n'.format(timer_test.toc()))
         self.ckp.write_log('Saving...')
 
@@ -121,7 +123,7 @@ class Trainer():
             self.ckp.end_background()
 
         if not self.args.test_only:
-            self.ckp.save(self, epoch, is_best=(best[1][0, 0] + 1 == epoch))
+            self.ckp.save(self, epoch, is_best=(best[1] + 1 == epoch))
 
         self.ckp.write_log(
             'Total: {:.2f}s\n'.format(timer_test.toc()), refresh=True
