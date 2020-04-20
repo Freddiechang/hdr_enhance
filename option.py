@@ -25,9 +25,9 @@ parser.add_argument('--dir_data', type=str, default='/home/shupeizhang/Codes/Dat
                     help='dataset directory')
 parser.add_argument('--dir_demo', type=str, default='../test',
                     help='demo image directory')
-parser.add_argument('--data_train', type=str, default='DIV2K',
+parser.add_argument('--data_train', type=str, default='Enlighten',
                     help='train dataset name')
-parser.add_argument('--data_test', type=str, default='DIV2K',
+parser.add_argument('--data_test', type=str, default='Enlighten',
                     help='test dataset name')
 parser.add_argument('--data_range', type=str, default='1-800/801-810',
                     help='train/test data range')
@@ -51,8 +51,6 @@ parser.add_argument('--img_height', type=int, default=32,
                     help='input image height, 0 to prevent resize')
 parser.add_argument('--img_width', type=int, default=32,
                     help='input image width, 0 to prevent resize')
-parser.add_argument('--data_mode', type=str, default='train',
-                    help='data mode, "train", "val" or "test"')
 parser.add_argument('--normalization', type=str, default='0+0+0+1+1+1',
                     help='normalization specs, mean followed by std, like "1.1+2.1+3.1+1.1+2.1+3.1"')
 parser.add_argument('--totensor', default=True,

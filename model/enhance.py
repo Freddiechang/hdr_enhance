@@ -28,9 +28,3 @@ class Enhance(nn.Module):
 
     def load(self, state_dict, strict=False):
         self.enhance.load_state_dict(state_dict, strict)
-
-
-def make_model(args):
-    device = torch.device('cpu' if args.cpu else 'cuda')
-    model = Enhance(args)
-    return model.to(device)

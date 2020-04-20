@@ -10,15 +10,15 @@ from PIL import Image
 
 from option import args
 
-class MyDataset(Dataset):
-    def __init__(self, args):
+class Enlighten(Dataset):
+    def __init__(self, args, mode='train'):
         data_root = args.dir_data
         normalization = args.normalization
         totensor = args.totensor
         resize = args.resize
         size = [args.img_height, args.img_width]
         annotation_type = args.annotation_type
-        self.mode = args.data_mode
+        self.mode = mode
         
         # transform for image, annotation
         t = [[], []]
