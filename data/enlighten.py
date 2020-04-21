@@ -34,7 +34,7 @@ class Enlighten(Dataset):
                 t[1].append(tf.ToTensor())
 
 
-        if normalization != [0, 0, 0, 1, 1, 1]:
+        if normalization != [[0, 0, 0], [1, 1, 1]]:
             t[0].append(tf.Normalize(normalization[0], normalization[1], inplace=True))
             if annotation_type == 'float':
                 t[1].append(tf.Normalize(normalization[0], normalization[1], inplace=True))
@@ -42,12 +42,12 @@ class Enlighten(Dataset):
 
         self.transform = [tf.Compose(t[0]), tf.Compose(t[1])]
         
-        if self.mode == 'val':
-            tmp_path = join(data_root, 'trainA')
+        if self.mode == 'test':
+            tmp_path = join(data_root, 'testA')
             self.images_path = tmp_path
             self.images = sorted([f for f in listdir(tmp_path) if isfile(join(tmp_path, f))])
 
-            tmp_path = join(data_root, 'trainB')
+            tmp_path = join(data_root, 'testB')
             self.annotations_path = tmp_path
             self.annotations = sorted([f for f in listdir(tmp_path) if isfile(join(tmp_path, f))])
         elif self.mode == 'train':
@@ -62,9 +62,7 @@ class Enlighten(Dataset):
             tmp_path = join(data_root, 'testA')
             self.images_path = tmp_path
             self.images = sorted([f for f in listdir(tmp_path) if isfile(join(tmp_path, f))])
-            tmp_path = join(data_root, 'testB')
-            self.images_path = tmp_path
-            self.images += sorted([f for f in listdir(tmp_path) if isfile(join(tmp_path, f))])
+            
 
         self.length = [len(self.images), len(self.annotations)]
 
@@ -80,13 +78,12 @@ class Enlighten(Dataset):
         image = Image.open(img_path)
         image = self.transform[0](image)
 
-        if self.mode != 'test':
+        if self.mode in ['test', 'train']:
             annotation = Image.open(anno_path)
             annotation = self.transform[1](annotation)
         # transform for image, annotation
 
-
-        sample = {'image': image, 'annotation': annotation}
+        sample = {'image': image, 'annotation': annotation, 'filename': self.annotations[idx]}
 
         return sample
 

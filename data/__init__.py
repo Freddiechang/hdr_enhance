@@ -25,10 +25,10 @@ class Data:
         testsets = []
         for d in args.data_test:
             m = import_module('data.' + d.lower())
-            testset.append(getattr(m, d)(args, mode='test'))
+            testsets.append(getattr(m, d)(args, mode='test'))
 
         self.loader_test = dataloader.DataLoader(
-                ConcatDataset(testset),
+                ConcatDataset(testsets),
                 batch_size=1,
                 shuffle=False,
                 pin_memory=not args.cpu,

@@ -9,7 +9,7 @@ def main():
     checkpoint = utility.checkpoint(args)
     # TODO: modify to allow loading checkpoint
     # if using GAN, both model and loss need to be loaded
-    _data_loader = data(args)
+    _data_loader = data.Data(args)
     _model = model.Model(args, checkpoint)
     _loss = loss.Loss(args, checkpoint) if not args.test_only else None
     _trainer = Trainer(args, _data_loader, _model, _loss, checkpoint)

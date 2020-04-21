@@ -9,6 +9,8 @@ import torch
 import torch.optim as optim
 import torch.optim.lr_scheduler as lrs
 
+from torchvision import transforms as t
+
 class timer():
     def __init__(self):
         self.acc = 0
@@ -101,9 +103,10 @@ class checkpoint():
         def bg_target(queue):
             while True:
                 if not queue.empty():
-                    filename, tensor = queue.get()
+                    filename, img = queue.get()
                     if filename is None: break
-                    imageio.imwrite(filename, tensor.numpy())
+                    img.save(filename, 'png')
+                    print("saving {}".format(filename))
         
         self.process = [
             Process(target=bg_target, args=(self.queue,)) \
@@ -117,18 +120,23 @@ class checkpoint():
         while not self.queue.empty(): time.sleep(1)
         for p in self.process: p.join()
 
-    def save_results(self, dataset, filename, save_list, scale):
+    def save_results(self, filename, save_list):
         if self.args.save_results:
             filename = self.get_path(
-                'results-{}'.format(dataset.dataset.name),
-                '{}_x{}_'.format(filename, scale)
+                'results-{}'.format(self.args.data_test[0]),
+                '{}-'.format(filename)
             )
 
-            postfix = ('SR', 'LR', 'HR')
+            postfix = ('input', 'label', 'output')
+            topil = t.ToPILImage()
             for v, p in zip(save_list, postfix):
-                normalized = v[0].mul(255 / self.args.rgb_range)
-                tensor_cpu = normalized.byte().permute(1, 2, 0).cpu()
-                self.queue.put(('{}{}.png'.format(filename, p), tensor_cpu))
+                #denormalization
+                if self.args.normalization != [[0, 0, 0], [1, 1, 1]]:
+                    std = torch.tensor(self.args.normalization[1]).view(1,3,1,1)
+                    mean = torch.tensor(self.args.normalization[0]).view(1,3,1,1)
+                    v = (v * std) + mean
+                img = topil(v.squeeze(dim=0).cpu())
+                self.queue.put(('{}{}.png'.format(filename, p), img))
 
 
 def make_optimizer(args, target):

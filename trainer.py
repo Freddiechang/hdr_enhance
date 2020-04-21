@@ -84,7 +84,7 @@ class Trainer():
         )
         self.model.eval()
         # for unpaired training
-        self.loss.gan_set_eval()
+        #self.loss.gan_set_eval()
         #######################
         timer_test = utility.timer()
         if self.args.save_results: self.ckp.begin_background()
@@ -96,6 +96,7 @@ class Trainer():
             lr, hr = self.prepare(d['image'], d['annotation'])
             sr = self.model(lr)
 
+            
             loss = self.loss(sr, hr)
             #used for unpaired training
             self.ckp.log[-1] += loss
@@ -103,7 +104,8 @@ class Trainer():
                 save_list.extend([lr, hr])
 
             if self.args.save_results:
-                self.ckp.save_results(d, filename[0], save_list, scale)
+                save_list = [lr, hr, sr]
+                self.ckp.save_results(d['filename'], save_list)
 
         #self.ckp.log[-1] /= (idx_data + 1)
         best = self.ckp.log.min(0)
@@ -131,6 +133,36 @@ class Trainer():
 
         torch.set_grad_enabled(True)
 
+    def test_only(self):
+        torch.set_grad_enabled(False)
+
+        epoch = self.optimizer.get_last_epoch()
+        self.model.eval()
+        # for unpaired training
+        #self.loss.gan_set_eval()
+        #######################
+        timer_test = utility.timer()
+        if self.args.save_results: self.ckp.begin_background()
+        ########### scale is no longer needed, set to 1
+        scale = 1
+        ###########
+        for idx_data, d in enumerate(self.loader_test):
+            lr, hr = self.prepare(d['image'], d['annotation'])
+            sr = self.model(lr)
+            filename = d['filename'][0]
+
+            if self.args.save_results:
+                save_list = [lr, hr, sr]
+                self.ckp.save_results(filename, save_list)
+        
+        if self.args.save_results:
+            self.ckp.end_background()
+
+        if not self.args.test_only:
+            self.ckp.save(self, epoch, is_best=(best[1] + 1 == epoch))
+
+        torch.set_grad_enabled(True)
+
     def prepare(self, *args):
         device = torch.device('cpu' if self.args.cpu else 'cuda:' + str(self.args.select_gpu))
         def _prepare(tensor):
@@ -141,7 +173,7 @@ class Trainer():
 
     def terminate(self):
         if self.args.test_only:
-            self.test()
+            self.test_only()
             return True
         else:
             epoch = self.optimizer.get_last_epoch() + 1
