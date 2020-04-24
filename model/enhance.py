@@ -18,13 +18,17 @@ class Enhance(nn.Module):
         self.enhance = EDSR(args)
         self.segmentation = Segmentation(args)
         self.fusion = Fusion(args)
+        self.partial_load = args.partial_load
         self.url = url
     
     def forward(self, x):
         e = self.enhance(x)
-        s = self.segmentation(x)
-        x = self.fusion(e, s)
-        return x
+        #s = self.segmentation(x)
+        #x = self.fusion(e, s)
+        return e
 
     def load(self, state_dict, strict=False):
-        self.enhance.load_state_dict(state_dict, strict)
+        if self.partial_load:
+            self.enhance.load_state_dict(state_dict, strict)
+        else:
+            self.load_state_dict(state_dict, strict)

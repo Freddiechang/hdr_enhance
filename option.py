@@ -66,6 +66,8 @@ parser.add_argument('--act', type=str, default='relu',
                     help='activation function')
 parser.add_argument('--pre_train', type=str, default='',
                     help='pre-trained model directory')
+parser.add_argument('--partial_load', action='store_true',
+                    help='load specific part of the model')
 parser.add_argument('--extend', type=str, default='.',
                     help='pre-trained model directory')
 parser.add_argument('--n_resblocks', type=int, default=16,
@@ -81,7 +83,7 @@ parser.add_argument('--dilation', action='store_true',
 parser.add_argument('--precision', type=str, default='single',
                     choices=('single', 'half'),
                     help='FP precision for test (single | half)')
-parser.add_argument('--seg_feats', type=int, default=10,
+parser.add_argument('--seg_feats', type=int, default=3,
                     help='number of segmentation features(regions)')
 
 

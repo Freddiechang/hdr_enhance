@@ -10,13 +10,14 @@ class Discriminator(nn.Module):
         super(Discriminator, self).__init__()
         in_channels = args.n_colors
         out_channels = 64
-        depth = 7
+        depth = 2
         temp = [self.base_block(in_channels, out_channels)]
         for i in range(depth - 1):
             temp.append(self.base_block(out_channels, out_channels))
         self.features = nn.Sequential(*temp)
+        class_in_feats = out_channels * args.img_height * args.img_width // 2**(depth*2)
         temp = [
-            nn.Linear(out_channels * args.img_height * args.img_width, 1024),
+            nn.Linear(class_in_feats, 1024),
             nn.LeakyReLU(negative_slope=0.2, inplace=True),
             nn.Linear(1024, 1)
         ]
@@ -32,6 +33,7 @@ class Discriminator(nn.Module):
             nn.Conv2d(in_channels, out_channels, kernel_size=3,
                      stride=stride, padding=1),
             nn.BatchNorm2d(out_channels),
+            nn.MaxPool2d(2, 2),
             nn.LeakyReLU(negative_slope=0.2, inplace=True)
         )
         return block

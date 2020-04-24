@@ -19,7 +19,6 @@ class Model(nn.Module):
         self.precision = args.precision
         self.cpu = args.cpu
         self.device = torch.device('cpu' if args.cpu else 'cuda:' + str(args.select_gpu))
-        print(self.device)
         self.n_GPUs = args.n_GPUs
         self.save_models = args.save_models
 
@@ -74,6 +73,7 @@ class Model(nn.Module):
             kwargs = {'map_location': lambda storage, loc: storage}
 
         if resume == -1:
+            print('Loading model from the latest save')
             load_from = torch.load(
                 os.path.join(apath, 'model_latest.pt'),
                 **kwargs
@@ -81,7 +81,7 @@ class Model(nn.Module):
         elif resume == 0:
             if pre_train == 'download':
                 print('Download the model')
-                dir_model = os.path.join('..', 'models')
+                dir_model = os.path.join('.', 'downloaded_models')
                 os.makedirs(dir_model, exist_ok=True)
                 load_from = torch.utils.model_zoo.load_url(
                     self.model.url,

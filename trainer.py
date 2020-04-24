@@ -84,7 +84,7 @@ class Trainer():
         )
         self.model.eval()
         # for unpaired training
-        #self.loss.gan_set_eval()
+        self.loss.gan_set_eval()
         #######################
         timer_test = utility.timer()
         if self.args.save_results: self.ckp.begin_background()
@@ -149,7 +149,7 @@ class Trainer():
         for idx_data, d in enumerate(self.loader_test):
             lr, hr = self.prepare(d['image'], d['annotation'])
             sr = self.model(lr)
-            filename = d['filename'][0]
+            filename = d['filename']
 
             if self.args.save_results:
                 save_list = [lr, hr, sr]

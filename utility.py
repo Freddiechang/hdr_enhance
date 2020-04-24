@@ -106,7 +106,6 @@ class checkpoint():
                     filename, img = queue.get()
                     if filename is None: break
                     img.save(filename, 'png')
-                    print("saving {}".format(filename))
         
         self.process = [
             Process(target=bg_target, args=(self.queue,)) \
@@ -120,12 +119,9 @@ class checkpoint():
         while not self.queue.empty(): time.sleep(1)
         for p in self.process: p.join()
 
-    def save_results(self, filename, save_list):
+    def save_results(self, filenames, save_list):
         if self.args.save_results:
-            filename = self.get_path(
-                'results-{}'.format(self.args.data_test[0]),
-                '{}-'.format(filename)
-            )
+            
 
             postfix = ('input', 'label', 'output')
             topil = t.ToPILImage()
@@ -135,8 +131,13 @@ class checkpoint():
                     std = torch.tensor(self.args.normalization[1]).view(1,3,1,1)
                     mean = torch.tensor(self.args.normalization[0]).view(1,3,1,1)
                     v = (v * std) + mean
-                img = topil(v.squeeze(dim=0).cpu())
-                self.queue.put(('{}{}.png'.format(filename, p), img))
+                for i in range(len(filenames)):
+                    filename = self.get_path(
+                    'results-{}'.format(self.args.data_test[0]),
+                    '{}-{:03d}-'.format(filenames[i][:-4]), self.log.shape[0]
+                    )
+                    img = topil(v[i].cpu())
+                    self.queue.put(('{}{}.png'.format(filename, p), img))
 
 
 def make_optimizer(args, target):
