@@ -121,8 +121,6 @@ class checkpoint():
 
     def save_results(self, filenames, save_list):
         if self.args.save_results:
-            
-
             postfix = ('input', 'label', 'output')
             topil = t.ToPILImage()
             for v, p in zip(save_list, postfix):
@@ -134,7 +132,7 @@ class checkpoint():
                 for i in range(len(filenames)):
                     filename = self.get_path(
                     'results-{}'.format(self.args.data_test[0]),
-                    '{}-{:03d}-'.format(filenames[i][:-4]), self.log.shape[0]
+                    '{}-{:03d}-'.format(filenames[i][:-4], self.log.shape[0])
                     )
                     img = topil(v[i].cpu())
                     self.queue.put(('{}{}.png'.format(filename, p), img))

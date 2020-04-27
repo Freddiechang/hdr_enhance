@@ -6,6 +6,13 @@ import torch.nn as nn
 import torch.nn.parallel as P
 import torch.utils.model_zoo
 
+
+def init_weights(m):
+    if type(m) == nn.Linear or type(m) == nn.Conv2d:
+        nn.init.xavier_uniform_(m.weight)
+        m.bias.data.fill_(0.01)
+
+
 class Model(nn.Module):
     def __init__(self, args, ckp):
         super(Model, self).__init__()
@@ -27,12 +34,17 @@ class Model(nn.Module):
         if args.precision == 'half':
             self.model.half()
 
-        self.load(
-            ckp.get_path('model'),
-            pre_train=args.pre_train,
-            resume=args.resume,
-            cpu=args.cpu
-        )
+        if not args.reset:
+            self.load(
+                ckp.get_path('model'),
+                pre_train=args.pre_train,
+                resume=args.resume,
+                cpu=args.cpu
+            )
+        else:
+            print("Initializing model...")
+            self.model.apply(init_weights)
+
         print(self.model, file=ckp.log_file)
 
     def forward(self, x):

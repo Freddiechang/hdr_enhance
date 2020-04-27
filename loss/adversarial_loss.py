@@ -46,8 +46,9 @@ class Adversarial(nn.Module):
                 loss_d = self.bce(d_real, d_fake)
             elif self.gan_type.find('WGAN') >= 0:
                 loss_d = (d_fake - d_real).mean()
-                if self.gan_type.find('GP') >= 0:
-                    epsilon = torch.rand_like(fake).view(-1, 1, 1, 1)
+                if self.gan_type.find('GP') >= 0 and self.training:
+                    epsilon = torch.rand(fake.shape[0]).view(-1, 1, 1, 1)
+                    epsilon = epsilon.to(fake_detach.device)
                     hat = fake_detach.mul(1 - epsilon) + real.mul(epsilon)
                     hat.requires_grad = True
                     d_hat = self.dis(hat)

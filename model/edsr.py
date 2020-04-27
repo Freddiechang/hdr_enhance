@@ -31,7 +31,7 @@ class EDSR(nn.Module):
             self.url = None
         self.sub_mean = common.MeanShift(args.rgb_range)
         #####TEST#####
-        #self.add_mean = common.MeanShift(args.rgb_range, sign=1)
+        self.add_mean = common.MeanShift(args.rgb_range, sign=1)
 
         # define head module
         m_head = [conv(args.n_colors, n_feats, kernel_size)]
