@@ -128,6 +128,8 @@ class checkpoint():
                 if self.args.normalization != [[0, 0, 0], [1, 1, 1]]:
                     std = torch.tensor(self.args.normalization[1]).view(1,3,1,1)
                     mean = torch.tensor(self.args.normalization[0]).view(1,3,1,1)
+                    std = std.to(v.device)
+                    mean = mean.to(v.device)
                     v = (v * std) + mean
                 for i in range(len(filenames)):
                     filename = self.get_path(

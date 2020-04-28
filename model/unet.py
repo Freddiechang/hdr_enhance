@@ -24,14 +24,20 @@ class UNet(nn.Module):
         self.outc = OutConv(64, n_classes)
 
     def forward(self, x):
-        x1 = self.inc(x)
-        x2 = self.down1(x1)
-        x3 = self.down2(x2)
-        x4 = self.down3(x3)
-        x5 = self.down4(x4)
-        x = self.up1(x5, x4)
-        x = self.up2(x, x3)
-        x = self.up3(x, x2)
-        x = self.up4(x, x1)
-        logits = self.outc(x)
+        i1 = x.max(dim=1).unsqueeze(1)
+        i1 = (i1 - 0.1).abs()
+        x1 = self.inc(x) * i1
+        i2 = F.interpolate(i1, scale_factor=0.5)
+        x2 = self.down1(x1) * i2
+        i3 = F.interpolate(i2, scale_factor=0.5)
+        x3 = self.down2(x2) * i3
+        i4 = F.interpolate(i3, scale_factor=0.5)
+        x4 = self.down3(x3) * i4
+        i5 = F.interpolate(i4, scale_factor=0.5)
+        x5 = self.down4(x4) * i5
+        x = self.up1(x5, x4) * i4
+        x = self.up2(x, x3) * i3
+        x = self.up3(x, x2) * i2
+        x = self.up4(x, x1) * i1
+        logits = self.outc(x) * i1
         return logits

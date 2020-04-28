@@ -99,7 +99,7 @@ class Trainer():
             
             loss = self.loss(sr, hr)
             #used for unpaired training
-            self.ckp.log[-1] += loss
+            self.ckp.log[-1] += loss.detach()
             if self.args.save_gt:
                 save_list.extend([lr, hr])
 
