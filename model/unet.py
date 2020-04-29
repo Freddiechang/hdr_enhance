@@ -24,7 +24,7 @@ class UNet(nn.Module):
         self.outc = OutConv(64, n_classes)
 
     def forward(self, x):
-        i1 = x.max(dim=1).unsqueeze(1)
+        i1 = x.max(dim=1)[0].unsqueeze(1)
         i1 = (i1 - 0.1).abs()
         x1 = self.inc(x) * i1
         i2 = F.interpolate(i1, scale_factor=0.5)
