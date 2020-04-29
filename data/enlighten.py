@@ -113,17 +113,3 @@ class DataPreFetcher(threading.Thread):
     def __iter__(self):
         return self
 
-
-def make_data_loader(args):
-    train_dataset = MyDataset(args)
-    t = args.data_mode
-    args.datamode = 'test'
-    test_dataset = MyDataset(args)
-    args.datamode = t
-    class Loader():
-        def __init__(self):
-            self.loader_train = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True,
-                                          num_workers=4, drop_last=True)
-            self.loader_test  = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=True,
-                                          num_workers=4, drop_last=True)
-    return Loader()
