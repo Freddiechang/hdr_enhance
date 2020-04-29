@@ -26,7 +26,7 @@ class Enhance(nn.Module):
         e = self.enhance(x)
         #s = self.segmentation(x)
         #x = self.fusion(e, s)
-        return e + x
+        return (e + x).clamp(-0.5, 0.5)
 
     def load(self, state_dict, strict=False):
         if self.partial_load:
