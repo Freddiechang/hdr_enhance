@@ -131,8 +131,8 @@ parser.add_argument('--loss', type=str, default='1*RGAN',
                     help='loss function configuration')
 parser.add_argument('--skip_threshold', type=float, default='1e8',
                     help='skipping batch that has large error')
-parser.add_argument('--gan_type', type=str, default='GAN',
-                    help='GAN type configuration, "GAN", "WGAN", "RGAN" or "WGAN_GP"')
+parser.add_argument('--hdr_illu_target', type=float, default='0.6',
+                    help='skipping batch that has large error')
 
 # Log specifications
 parser.add_argument('--save', type=str, default='test',

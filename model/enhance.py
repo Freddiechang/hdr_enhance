@@ -21,12 +21,17 @@ class Enhance(nn.Module):
         #self.fusion = Fusion(args)
         self.partial_load = args.partial_load
         self.url = url
+        self.normalization = args.normalization
     
     def forward(self, x):
         e = self.enhance(x)
         #s = self.segmentation(x)
         #x = self.fusion(e, s)
-        return (e + x).clamp(-0.5, 0.5)
+        e += x
+        e = e - e.min(dim=2)[0].min(dim=2)[0].unsqueeze(2).unsqueeze(3)
+        e = e / e.max(dim=2)[0].max(dim=2)[0].unsqueeze(2).unsqueeze(3)
+        e = e - torch.tensor(self.normalization[0]).view(1, -1, 1, 1)
+        return e
 
     def load(self, state_dict, strict=False):
         if self.partial_load:

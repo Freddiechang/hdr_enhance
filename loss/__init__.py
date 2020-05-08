@@ -32,6 +32,9 @@ class Loss(nn.modules.loss._Loss):
             elif loss_type.find('GAN') >= 0:
                 module = import_module('loss.adversarial_loss')
                 loss_function = getattr(module, 'Adversarial')(args, loss_type)
+            else:
+                module = import_module(loss_type.lower())
+                loss_function = getattr(module, loss_type)(args)
 
             self.loss.append({
                 'type': loss_type,
