@@ -8,13 +8,24 @@ class HDR_loss(nn.Module):
         self.normalization = args.normalization
 
     def forward(self, x):
-        pass
+        e = self.exposure(x)
+        s = self.saturarion(x)
+        c = self.contrast(x)
+        r = e * s * c
+        return -r.sum()
 
     def exposure(self, x):
-        pass
+        return x.max(dim=1)[0].unsqueeze(1)
 
     def saturation(self, x):
-        pass
+        cmax = x.max(dim=1)[0]
+        cmin = x.min(dim=1)[0]
+        s = (cmax - cmin) / cmax
+        return s.unsqeeze(1)
 
     def contrast(self, x):
-        pass
+        sk = torch.tensor([[0,-1,0],[-1,4,-1],[0,-1,0.]])/3
+        k = torch.stack((sk, sk, sk)).unsqueeze(dim=0)
+        k = k.to(x.device)
+        return F.conv2d(x, k, padding=1)
+        

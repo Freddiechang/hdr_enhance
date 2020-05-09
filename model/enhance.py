@@ -30,7 +30,7 @@ class Enhance(nn.Module):
         e += x
         e = e - e.min(dim=2)[0].min(dim=2)[0].unsqueeze(2).unsqueeze(3)
         e = e / e.max(dim=2)[0].max(dim=2)[0].unsqueeze(2).unsqueeze(3)
-        e = e - torch.tensor(self.normalization[0]).view(1, -1, 1, 1)
+        e = e - torch.tensor(self.normalization[0]).view(1, -1, 1, 1).to(e.device)
         return e
 
     def load(self, state_dict, strict=False):
