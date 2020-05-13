@@ -8,6 +8,8 @@ from model.unet_parts import *
 class UNet(nn.Module):
     def __init__(self, args):
         super(UNet, self).__init__()
+        self.hdr_illu_target = (args.hdr_illu_target - max(args.normalization[0]))
+        self.illu_offset = args.hdr_illu_target if args.hdr_illu_target < 0.5 else 1 - args.hdr_illu_target
         n_classes = args.seg_feats
         bilinear = True
 
@@ -25,7 +27,7 @@ class UNet(nn.Module):
 
     def forward(self, x):
         i1 = x.max(dim=1)[0].unsqueeze(1)
-        i1 = (i1 - 0.1).abs()
+        i1 = (i1 - self.hdr_illu_target).abs() + self.illu_offset
         x1 = self.inc(x) * i1
         i2 = F.interpolate(i1, scale_factor=0.5)
         x2 = self.down1(x1) * i2

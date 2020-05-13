@@ -7,12 +7,16 @@ class HDR_loss(nn.Module):
         super(HDR_loss, self).__init__()
         self.normalization = args.normalization
 
-    def forward(self, x):
+    def forward(self, x, label):
         e = self.exposure(x)
-        s = self.saturarion(x)
+        s = self.saturation(x)
         c = self.contrast(x)
-        r = e * s * c
-        return -r.sum()
+        r1 = e * s * c
+        e = self.exposure(label)
+        s = self.saturation(label)
+        c = self.contrast(label)
+        r2 = e * s * c
+        return (r2-r1).sum().abs()
 
     def exposure(self, x):
         return x.max(dim=1)[0].unsqueeze(1)
@@ -21,7 +25,7 @@ class HDR_loss(nn.Module):
         cmax = x.max(dim=1)[0]
         cmin = x.min(dim=1)[0]
         s = (cmax - cmin) / cmax
-        return s.unsqeeze(1)
+        return s.unsqueeze(1)
 
     def contrast(self, x):
         sk = torch.tensor([[0,-1,0],[-1,4,-1],[0,-1,0.]])/3
