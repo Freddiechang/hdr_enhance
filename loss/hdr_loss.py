@@ -25,7 +25,7 @@ class HDR_loss(nn.Module):
     def saturation(self, x):
         cmax = x.max(dim=1)[0]
         cmin = x.min(dim=1)[0]
-        s = (cmax - cmin) / cmax
+        s = cmax - cmin
         return s.unsqueeze(1)
 
     def contrast(self, x):

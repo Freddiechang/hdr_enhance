@@ -2,17 +2,19 @@ from os import listdir
 from os.path import isfile, join, isdir
 from torch.multiprocessing import Queue
 import threading
+import random
 
 from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
 from torchvision import transforms as tf
 from PIL import Image
+import rawpy
 
 from option import args
 
-class Enlighten(Dataset):
+class HDRPLUS(Dataset):
     def __init__(self, args, mode='train'):
-        data_root = join(args.dir_data, "EnlightenGAN")
+        data_root = join(args.dir_data, "hdrplus")
         normalization = args.normalization
         totensor = args.totensor
         resize = args.resize
@@ -42,40 +44,40 @@ class Enlighten(Dataset):
 
         self.transform = [tf.Compose(t[0]), tf.Compose(t[1])]
         
+        tmp_path = join(data_root, 'burst')
+        self.images_path = tmp_path
+        images = sorted([f for f in listdir(tmp_path)])
+
+        tmp_path = join(data_root, 'results_20171023')
+        self.annotations_path = tmp_path
+        annotations = sorted([f for f in listdir(tmp_path)])
+        
         if self.mode == 'test':
-            tmp_path = join(data_root, 'testA')
-            self.images_path = tmp_path
-            self.images = sorted([f for f in listdir(tmp_path) if isfile(join(tmp_path, f))])
-
-            tmp_path = join(data_root, 'testB')
-            self.annotations_path = tmp_path
-            self.annotations = sorted([f for f in listdir(tmp_path) if isfile(join(tmp_path, f))])
+            images_ = images[-15:]
+            self.annotations = annotations[-15:]
         elif self.mode == 'train':
-            tmp_path = join(data_root, 'trainA')
-            self.images_path = tmp_path
-            self.images = sorted([f for f in listdir(tmp_path) if isfile(join(tmp_path, f))])
-
-            tmp_path = join(data_root, 'trainB')
-            self.annotations_path = tmp_path
-            self.annotations = sorted([f for f in listdir(tmp_path) if isfile(join(tmp_path, f))])
+            images_ = images[:-15]
+            self.annotations = annotations[:-15]
         else:
-            tmp_path = join(data_root, 'testA')
-            self.images_path = tmp_path
-            self.images = sorted([f for f in listdir(tmp_path) if isfile(join(tmp_path, f))])
+            self.images = images
+            self.annotations = annotations
             
 
-        self.length = [len(self.images), len(self.annotations)]
+        self.length = len(self.images)
 
 
     def __len__(self):
-        return self.length[1]
+        return self.length
 
     def __getitem__(self, idx):
-        img_path = join(self.images_path, self.images[idx%self.length[0]])
-        anno_path = join(self.annotations_path, self.annotations[idx])
+        images = [f for f in listdir(join(self.images_path, self.images[idx])) if 'payload' in f]
+        img_path = join(self.images_path, self.images[idx], random.choice(images))
+        anno_path = join(self.annotations_path, self.annotations[idx], 'final.jpg')
 
 
-        image = Image.open(img_path)
+        image = rawpy.imread(img_path)
+        image = image.postprocess()
+        image = Image.fromarray(image)
         image = self.transform[0](image)
 
         if self.mode in ['test', 'train']:
@@ -83,7 +85,7 @@ class Enlighten(Dataset):
             annotation = self.transform[1](annotation)
         # transform for image, annotation
 
-        sample = {'image': image, 'annotation': annotation, 'filename': self.annotations[idx]}
+        sample = {'image': image, 'annotation': annotation, 'filename': self.images[idx]}
 
         return sample
 
@@ -112,4 +114,3 @@ class DataPreFetcher(threading.Thread):
 
     def __iter__(self):
         return self
-

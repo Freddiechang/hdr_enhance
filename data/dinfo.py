@@ -12,7 +12,7 @@ from option import args
 
 class DINFO(Dataset):
     def __init__(self, args, mode='train'):
-        data_root = args.dir_data
+        data_root = join(args.dir_data, "DINFO")
         normalization = args.normalization
         totensor = args.totensor
         resize = args.resize
