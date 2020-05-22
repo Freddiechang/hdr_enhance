@@ -44,7 +44,7 @@ class HDRPLUS(Dataset):
 
         self.transform = [tf.Compose(t[0]), tf.Compose(t[1])]
         
-        tmp_path = join(data_root, 'burst')
+        tmp_path = join(data_root, 'bursts')
         self.images_path = tmp_path
         images = sorted([f for f in listdir(tmp_path)])
 
@@ -53,10 +53,10 @@ class HDRPLUS(Dataset):
         annotations = sorted([f for f in listdir(tmp_path)])
         
         if self.mode == 'test':
-            images_ = images[-15:]
+            self.images = images[-15:]
             self.annotations = annotations[-15:]
         elif self.mode == 'train':
-            images_ = images[:-15]
+            self.images = images[:-15]
             self.annotations = annotations[:-15]
         else:
             self.images = images

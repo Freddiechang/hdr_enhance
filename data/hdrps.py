@@ -10,7 +10,7 @@ from torchvision import transforms as tf
 from PIL import Image
 import cv2
 import numpy as np
-import pyraw
+import rawpy
 
 from option import args
 
@@ -48,11 +48,11 @@ class HDRPS(Dataset):
         
         tmp_path = join(data_root)
         self.images_path = tmp_path
-        images = sorted([f for f in listdir(tmp_path) if f != 'HDR'])
+        self.images = sorted([f for f in listdir(tmp_path) if f != 'HDR'])
 
         tmp_path = join(data_root, 'HDR')
         self.annotations_path = tmp_path
-        annotations = sorted([f for f in listdir(tmp_path) if isfile(join(tmp_path, f))])
+        self.annotations = sorted([f for f in listdir(tmp_path) if isfile(join(tmp_path, f))])
         
         self.length = [len(self.images), len(self.annotations)]
 
@@ -72,9 +72,12 @@ class HDRPS(Dataset):
             anno_path = join(self.annotations_path, self.images[idx] + '.exr')
 
 
-        image = rawpy.imread(img_path)
-        image = image.postprocess()
-        image = Image.fromarray(image)
+        if img_path[-3:] == 'NEF':
+            image = rawpy.imread(img_path)
+            image = image.postprocess()
+            image = Image.fromarray(image)
+        else:
+            image = Image.open(img_path)
         image = self.transform[0](image)
 
         if self.mode in ['test', 'train']:
