@@ -3,6 +3,8 @@ from importlib import import_module
 from torch.utils.data import dataloader
 from torch.utils.data import ConcatDataset
 
+from torch.multiprocessing import Queue
+import threading
 
 class Data:
     def __init__(self, args):
@@ -35,3 +37,28 @@ class Data:
                 num_workers=args.n_threads,
             )
 
+
+class DataPreFetcher(threading.Thread):
+    def __init__(self, generator, max_prefetch=1):
+        threading.Thread.__init__(self)
+        self.queue = Queue(max_prefetch)
+        self.generator = generator
+        self.daemon = True
+        self.start()
+
+    def run(self):
+        for item in self.generator:
+            self.queue.put(item)
+        self.queue.put(None)
+
+    def next(self):
+        next_item = self.queue.get()
+        if next_item is None:
+            raise StopIteration
+        return next_item
+
+    def __next__(self):
+        return self.next()
+
+    def __iter__(self):
+        return self

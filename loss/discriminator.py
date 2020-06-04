@@ -10,7 +10,7 @@ class Discriminator(nn.Module):
         super(Discriminator, self).__init__()
         in_channels = args.n_colors
         out_channels = 64
-        depth = 2
+        depth = 5
         temp = [self.base_block(in_channels, out_channels)]
         for i in range(depth - 1):
             temp.append(self.base_block(out_channels, out_channels))
