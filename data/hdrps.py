@@ -82,7 +82,7 @@ class HDRPS(Dataset):
             annotation = cv2.imread(anno_path, cv2.IMREAD_UNCHANGED|cv2.IMREAD_ANYCOLOR)
             amap = annotation <= 0.0031308
             annotation[amap] = annotation[amap] * 12.92
-            annotation[np.logical_not(amap)]= annotation[np.logical_not(amap)] ** (1.0/2.4) * 1.055 - 0.055
+            annotation[np.logical_not(amap)] = annotation[np.logical_not(amap)] ** (1.0/2.4) * 1.055 - 0.055
             annotation = np.clip(annotation, 0, 1)
             annotation = (annotation * 255).astype(np.uint8)
             annotation = Image.fromarray(annotation)
