@@ -8,15 +8,13 @@ class self_preserve_res_loss(nn.Module):
         super(self_preserve_res_loss, self).__init__()
         self.normalization = args.normalization
         resnet = models.resnet18(pretrained=True)
-        self.resnet = []
-        self.resnet.append(resnet.conv1)
-        self.resnet.append(resnet.bn1)
-        self.resnet.append(resnet.relu)
-        self.resnet.append(resnet.maxpool)
-        self.resnet.append(resnet.layer1)
-        self.resnet.append(resnet.layer2)
-        self.resnet.append(resnet.layer3)
-        self.resnet = nn.Sequential(self.resnet)
+        self.resnet = nn.Sequential(resnet.conv1,
+                                    resnet.bn1,
+                                    resnet.relu,
+                                    resnet.maxpool,
+                                    resnet.layer1,
+                                    resnet.layer2,
+                                    resnet.layer3)
         for p in self.resnet.parameters():
             p.requires_grad = False
 
@@ -29,7 +27,7 @@ class self_preserve_res_loss(nn.Module):
             x = (x * std) + mean
             label = (label * std) + mean
         x = self.resnet(x)
-        label = self.vgg(label)
+        label = self.resnet(label)
         diff = label - x
         diff = (diff ** 2).mean()
         return diff
