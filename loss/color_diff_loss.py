@@ -8,9 +8,9 @@ class color_diff_loss(nn.Module):
         self.normalization = args.normalization
 
     def forward(self, x, label):
-        if self.args.normalization != [[0, 0, 0], [1, 1, 1]]:
-            std = torch.tensor(self.args.normalization[1]).view(1,3,1,1)
-            mean = torch.tensor(self.args.normalization[0]).view(1,3,1,1)
+        if self.normalization != [[0, 0, 0], [1, 1, 1]]:
+            std = torch.tensor(self.normalization[1]).view(1,3,1,1)
+            mean = torch.tensor(self.normalization[0]).view(1,3,1,1)
             std = std.to(x.device)
             mean = mean.to(x.device)
             x = (x * std) + mean

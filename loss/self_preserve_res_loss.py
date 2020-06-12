@@ -3,13 +3,21 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torchvision.models as models
 
-class self_preserve_loss(nn.Module):
+class self_preserve_res_loss(nn.Module):
     def __init__(self, args):
-        super(self_preserve_loss, self).__init__()
+        super(self_preserve_res_loss, self).__init__()
         self.normalization = args.normalization
-        vgg = models.vgg11(pretrained=True)
-        self.vgg = vgg.features[0:17]
-        for p in self.vgg.parameters():
+        resnet = models.resnet18(pretrained=True)
+        self.resnet = []
+        self.resnet.append(resnet.conv1)
+        self.resnet.append(resnet.bn1)
+        self.resnet.append(resnet.relu)
+        self.resnet.append(resnet.maxpool)
+        self.resnet.append(resnet.layer1)
+        self.resnet.append(resnet.layer2)
+        self.resnet.append(resnet.layer3)
+        self.resnet = nn.Sequential(self.resnet)
+        for p in self.resnet.parameters():
             p.requires_grad = False
 
     def forward(self, x, label):
@@ -20,7 +28,7 @@ class self_preserve_loss(nn.Module):
             mean = mean.to(x.device)
             x = (x * std) + mean
             label = (label * std) + mean
-        x = self.vgg(x)
+        x = self.resnet(x)
         label = self.vgg(label)
         diff = label - x
         diff = (diff ** 2).mean()
