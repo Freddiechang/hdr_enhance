@@ -56,6 +56,11 @@ class Huawei(Dataset):
 
 
         image = Image.open(img_path)
+        if image.mode == "RGBA":
+            image.load()
+            background = Image.new("RGB", image.size, (255, 255, 255))
+            background.paste(image, mask=image.split()[3])
+            image = background
         annotation = image
         image = self.transform[0](image)
         annotation = self.transform[1](annotation)
