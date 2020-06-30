@@ -21,6 +21,6 @@ class Discriminator(nn.Module):
         
     
     def forward(self, x):
-        x = self.features(x)
+        x = self.resnet(x)
         x = x.view(x.shape[0], -1)
         return self.classifier(x)
