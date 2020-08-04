@@ -51,11 +51,11 @@ class HDRPLUS(Dataset):
         annotations = sorted([f for f in listdir(tmp_path)])
         
         if self.mode == 'test':
-            self.images = images[-15:]
-            self.annotations = annotations[-15:]
+            self.images = images[-300:]
+            self.annotations = annotations[-300:]
         elif self.mode == 'train':
-            self.images = images[:-15]
-            self.annotations = annotations[:-15]
+            self.images = images[:-300]
+            self.annotations = annotations[:-300]
         else:
             self.images = images
             self.annotations = annotations

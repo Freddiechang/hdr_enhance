@@ -1,5 +1,5 @@
 #!/bin/zsh
-scp -r -P 24617 freddieonfire.ga:/home/shupeizhang/compressed ./
+scp -r -P 24617 shupeizhang@freddieonfire.ga:/home/shupeizhang/compressed ./
 vared -p 'Start Epoch Num: ' -c start
 vared -p 'End Epoch Num: ' -c end
 for i in $(seq -f "%03g" $start $end)
