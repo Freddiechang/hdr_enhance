@@ -150,6 +150,7 @@ class Trainer():
             lr, hr = self.prepare(d['image'], d['annotation'])
             sr = self.model(lr)
             filename = d['filename']
+            filename = ['test_only_' + self.args.pre_train[:-3] + i for i in filename]
 
             if self.args.save_results:
                 save_list = [lr, hr, sr]

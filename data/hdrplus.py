@@ -69,7 +69,10 @@ class HDRPLUS(Dataset):
 
     def __getitem__(self, idx):
         images = [f for f in listdir(join(self.images_path, self.images[idx])) if 'payload' in f]
-        img_path = join(self.images_path, self.images[idx], random.choice(images))
+        if self.mode == "test":
+            img_path = join(self.images_path, self.images[idx], images[len(images)//2])
+        else:
+            img_path = join(self.images_path, self.images[idx], random.choice(images))
         anno_path = join(self.annotations_path, self.annotations[idx], 'final.jpg')
 
 
