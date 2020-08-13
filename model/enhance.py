@@ -2,9 +2,6 @@ import torch
 import torch.nn as nn
 
 from option import args
-from model.edsr import EDSR
-from model.other import Fusion
-from model.other import Segmentation
 from model.unet import UNet
 
 url = 'https://cv.snu.ac.kr/research/EDSR/models/edsr_baseline_x2-1bc95232.pt'
