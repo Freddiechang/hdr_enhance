@@ -1,7 +1,5 @@
 from os import listdir
 from os.path import isfile, join, isdir
-from torch.multiprocessing import Queue
-import threading
 import random
 
 from torch.utils.data import Dataset
@@ -84,7 +82,7 @@ class HDRPS(Dataset):
             annotation = cv2.imread(anno_path, cv2.IMREAD_UNCHANGED|cv2.IMREAD_ANYCOLOR)
             amap = annotation <= 0.0031308
             annotation[amap] = annotation[amap] * 12.92
-            annotation[np.logical_not(amap)]= annotation[np.logical_not(amap)] ** (1.0/2.4) * 1.055 - 0.055
+            annotation[np.logical_not(amap)] = annotation[np.logical_not(amap)] ** (1.0/2.4) * 1.055 - 0.055
             annotation = np.clip(annotation, 0, 1)
             annotation = (annotation * 255).astype(np.uint8)
             annotation = Image.fromarray(annotation)
@@ -95,28 +93,3 @@ class HDRPS(Dataset):
 
         return sample
 
-
-class DataPreFetcher(threading.Thread):
-    def __init__(self, generator, max_prefetch=1):
-        threading.Thread.__init__(self)
-        self.queue = Queue(max_prefetch)
-        self.generator = generator
-        self.daemon = True
-        self.start()
-
-    def run(self):
-        for item in self.generator:
-            self.queue.put(item)
-        self.queue.put(None)
-
-    def next(self):
-        next_item = self.queue.get()
-        if next_item is None:
-            raise StopIteration
-        return next_item
-
-    def __next__(self):
-        return self.next()
-
-    def __iter__(self):
-        return self

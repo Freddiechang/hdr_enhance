@@ -18,7 +18,11 @@ class color_diff_loss(nn.Module):
         c1 = self.color(x)
         c2 = self.color(label)
         l = (c2-c1) ** 2
+<<<<<<< HEAD
         return l.mean()
+=======
+        return l.sum()
+>>>>>>> df3a6d21ef98a94db9867b542254bd3f827fdb0f
 
     def color(self, x):
         # rgb to cie xyz
@@ -37,4 +41,8 @@ class color_diff_loss(nn.Module):
         x[~bitmap] = x[~bitmap] * 7.787 + 16/116
         ciea = 500 * (x[:,0,:,:] - x[:,1,:,:])
         cieb = 500 * (x[:,1,:,:] - x[:,2,:,:])
+<<<<<<< HEAD
         return torch.stack((ciea, cieb), dim=1)
+=======
+        return torch.stack((ciea, cieb), dim=1)
+>>>>>>> df3a6d21ef98a94db9867b542254bd3f827fdb0f

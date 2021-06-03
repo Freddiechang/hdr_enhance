@@ -25,3 +25,7 @@ class self_preserve_loss(nn.Module):
         diff = label - x
         diff = (diff ** 2).mean()
         return diff
+<<<<<<< HEAD
+=======
+        
+>>>>>>> df3a6d21ef98a94db9867b542254bd3f827fdb0f

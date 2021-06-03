@@ -43,7 +43,11 @@ class Huawei(Dataset):
         tmp_path = data_root
         self.images_path = tmp_path
         self.images = sorted([f for f in listdir(tmp_path) if isfile(join(tmp_path, f))])
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> df3a6d21ef98a94db9867b542254bd3f827fdb0f
 
         self.length = len(self.images)
 
@@ -63,7 +67,10 @@ class Huawei(Dataset):
             image = background
         annotation = image
         image = self.transform[0](image)
+<<<<<<< HEAD
         #print(image.shape)
+=======
+>>>>>>> df3a6d21ef98a94db9867b542254bd3f827fdb0f
         annotation = self.transform[1](annotation)
 
 
@@ -71,4 +78,7 @@ class Huawei(Dataset):
 
         return sample
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> df3a6d21ef98a94db9867b542254bd3f827fdb0f
