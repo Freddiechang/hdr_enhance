@@ -1,0 +1,12 @@
+CUDA_VISIBLE_DEVICES=0 python main.py \
+  --test_only \
+  --n_GPUs 1 --batch_size 1 --save_results  \
+  --img_width 720 --img_height 534 \
+  --save_models --normalization 0.5+0.5+0.5+1+1+1 \
+  --epochs 300 \
+  --data_train HDRPS+HDRPS+HDRPLUS \
+  --print_every 25 \
+  --data_test HDRPLUS_TEST \
+  --loss 1*MSE \
+  --save i_gan_color_self \
+  --pre_train experiment/test_gan_color_self/model/model_61.pt \

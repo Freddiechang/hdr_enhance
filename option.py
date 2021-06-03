@@ -9,7 +9,7 @@ parser.add_argument('--template', default='.',
                     help='You can set various templates in option.py')
 
 # Hardware specifications
-parser.add_argument('--n_threads', type=int, default=6,
+parser.add_argument('--n_threads', type=int, default=4,
                     help='number of threads for data loading')
 parser.add_argument('--cpu', action='store_true',
                     help='use cpu only')
@@ -21,13 +21,13 @@ parser.add_argument('--seed', type=int, default=1,
                     help='random seed')
 
 # Data specifications
-parser.add_argument('--dir_data', type=str, default='/home/shupeizhang/Codes/Datasets/EnlightenGAN',
+parser.add_argument('--dir_data', type=str, default='/mnt/hdd1/lxc-hdd1/shupei/Datasets',
                     help='dataset directory')
 parser.add_argument('--dir_demo', type=str, default='../test',
                     help='demo image directory')
-parser.add_argument('--data_train', type=str, default='Enlighten',
+parser.add_argument('--data_train', type=str, default='HDRPS+HDRPS+HDRPLUS+HDRPLUS+DINFO',
                     help='train dataset name')
-parser.add_argument('--data_test', type=str, default='Enlighten',
+parser.add_argument('--data_test', type=str, default='HDRPLUS+DINFO',
                     help='test dataset name')
 parser.add_argument('--data_range', type=str, default='1-800/801-810',
                     help='train/test data range')
@@ -47,9 +47,9 @@ parser.add_argument('--no_augment', action='store_true',
                     help='do not use data augmentation')
 parser.add_argument('--resize', default=True,
                     help='do resizing on input data')
-parser.add_argument('--img_height', type=int, default=32,
+parser.add_argument('--img_height', type=int, default=256,
                     help='input image height, 0 to prevent resize')
-parser.add_argument('--img_width', type=int, default=32,
+parser.add_argument('--img_width', type=int, default=256,
                     help='input image width, 0 to prevent resize')
 parser.add_argument('--normalization', type=str, default='0+0+0+1+1+1',
                     help='normalization specs, mean followed by std, like "1.1+2.1+3.1+1.1+2.1+3.1"')
@@ -127,10 +127,12 @@ parser.add_argument('--gclip', type=float, default=0,
                     help='gradient clipping threshold (0 = no clipping)')
 
 # Loss specifications
-parser.add_argument('--loss', type=str, default='1*RGAN',
+parser.add_argument('--loss', type=str, default='0.5*WGANGP+0.5*MSE',
                     help='loss function configuration')
 parser.add_argument('--skip_threshold', type=float, default='1e8',
                     help='skipping batch that has large error')
+parser.add_argument('--gan_type', type=str, default='GAN',
+                    help='GAN type configuration, "GAN", "WGAN", "RGAN" or "WGAN_GP"')
 parser.add_argument('--hdr_illu_target', type=float, default='0.6',
                     help='skipping batch that has large error')
 
@@ -167,5 +169,4 @@ for arg in vars(args):
         vars(args)[arg] = True
     elif vars(args)[arg] == 'False':
         vars(args)[arg] = False
-
 

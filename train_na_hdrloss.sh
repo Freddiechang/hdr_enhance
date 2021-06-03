@@ -1,13 +1,13 @@
-CUDA_VISIBLE_DEVICES=0 python main.py \
+CUDA_VISIBLE_DEVICES=3 python main.py \
   --n_GPUs 1 --batch_size 4 --save_results  \
   --img_width 224 --img_height 224 \
   --save_models --normalization 0.5+0.5+0.5+1+1+1 \
-  --epochs 300 \
+  --epochs 50 \
   --data_train HDRPS+HDRPLUS \
   --print_every 100 \
-  --data_test HDRPS+HDRPLUS+Huawei \
+  --data_test HDRPLUS \
   --model enhance_na \
-  --loss 1*MSE \
+  --loss 0.0002*color_diff_loss+0.01*HDR_loss+0.2*GAN+1*MSE \
   --reset \
-  --save test_mse
+  --save test_gan_color
 #  --pre_train ../self_preserve.pt \

@@ -2,3 +2,4 @@
 *.pth
 __pycache__
 experiment/
+good_results_gan_attn/

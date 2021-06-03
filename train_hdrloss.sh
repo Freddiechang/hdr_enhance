@@ -7,7 +7,7 @@ CUDA_VISIBLE_DEVICES=0 python main.py \
   --print_every 100 \
   --data_test HDRPS+HDRPLUS+Huawei \
   --model enhance_na \
-  --loss 1*MSE \
+  --loss 0.2*GAN+1*MSE \
   --reset \
-  --save test_mse
+  --save test_gan
 #  --pre_train ../self_preserve.pt \

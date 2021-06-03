@@ -12,7 +12,7 @@ import rawpy
 
 from option import args
 
-class HDRPLUS(Dataset):
+class HDRPLUS_TEST(Dataset):
     def __init__(self, args, mode='train'):
         data_root = join(args.dir_data, "hdrplus")
         normalization = args.normalization
@@ -53,8 +53,8 @@ class HDRPLUS(Dataset):
         annotations = sorted([f for f in listdir(tmp_path)])
         
         if self.mode == 'test':
-            self.images = images[-300:]
-            self.annotations = annotations[-300:]
+            self.images = ['bee7_20150829_155229_854']
+            self.annotations = ['bee7_20150829_155229_854']
         elif self.mode == 'train':
             self.images = images[:-300]
             self.annotations = annotations[:-300]
@@ -67,7 +67,7 @@ class HDRPLUS(Dataset):
 
 
     def __len__(self):
-        return self.length
+        return 1
 
     def __getitem__(self, idx):
         images = [f for f in listdir(join(self.images_path, self.images[idx])) if 'payload' in f]
